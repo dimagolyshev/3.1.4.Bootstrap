@@ -2,6 +2,8 @@ package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 import ru.kata.spring.boot_security.demo.service.ViewFormatter;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
+@RequestMapping("/api/admin")
 public class AdminController {
 
     private final UserService userService;
@@ -26,32 +29,33 @@ public class AdminController {
         this.viewFormatter = viewFormatter;
     }
 
-    @GetMapping(value = "/admin")
-    public String printUsers(ModelMap model) {
+    @GetMapping
+    public ModelAndView printUsers(ModelMap model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        model.addAttribute("userDetails",
+        ModelAndView modelAndView = new ModelAndView("admin");
+        modelAndView.addObject("userDetails",
                 userService.getUserDetails(
                         userService.findByUsername(
                                 authentication.getName())));
-        model.addAttribute("users", userService.list());
-        model.addAttribute("availableRoles", roleService.list());
-        model.addAttribute("viewFormatter", viewFormatter);
-        return "admin";
+        modelAndView.addObject("users", userService.list());
+        modelAndView.addObject("availableRoles", roleService.list());
+        modelAndView.addObject("viewFormatter", viewFormatter);
+        return modelAndView;
     }
 
-    @PostMapping(value = "/admin/add")
-    public String addUser(@RequestParam String firstName,
+    @PostMapping(value = "/add")
+    public ModelAndView addUser(@RequestParam String firstName,
                           @RequestParam String lastName,
                           @RequestParam String password,
                           @RequestParam byte age,
                           @RequestParam String email,
                           @RequestParam List<String> roles) {
         userService.add(firstName, lastName, password, age, email, roles);
-        return "redirect:/admin";
+        return new ModelAndView("redirect:.");
     }
 
-    @PostMapping(value = "/admin/edit")
-    public String updateUser(@RequestParam Long id,
+    @PostMapping(value = "/edit")
+    public ModelAndView updateUser(@RequestParam Long id,
                              @RequestParam String firstName,
                              @RequestParam String lastName,
                              @RequestParam String password,
@@ -59,13 +63,13 @@ public class AdminController {
                              @RequestParam String email,
                              @RequestParam List<String> roles) {
         userService.edit(id, firstName, lastName, password, age, email, roles);
-        return "redirect:/admin";
+        return new ModelAndView("redirect:.");
     }
 
-    @PostMapping(value = "/admin/delete")
-    public String deleteUser(@RequestParam("id") Long id) {
+    @PostMapping(value = "/delete")
+    public ModelAndView deleteUser(@RequestParam("id") Long id) {
         userService.deleteById(id);
-        return "redirect:/admin";
+        return new ModelAndView("redirect:.");
     }
 
 }
