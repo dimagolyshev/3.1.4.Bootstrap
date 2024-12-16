@@ -20,7 +20,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ModelAndView userPage(Model model) {
+    public ModelAndView userPage() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         ModelAndView modelAndView = new ModelAndView("user");
         modelAndView.addObject("userDetails",

@@ -30,7 +30,7 @@ public class AdminController {
     }
 
     @GetMapping
-    public ModelAndView printUsers(ModelMap model) {
+    public ModelAndView printUsers() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         ModelAndView modelAndView = new ModelAndView("admin");
         modelAndView.addObject("userDetails",
